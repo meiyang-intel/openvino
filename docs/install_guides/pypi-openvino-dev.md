@@ -28,10 +28,10 @@ The table below lists the supported operating systems and Python* versions requi
 
 | Supported Operating System                                   | [Python* Version (64-bit)](https://www.python.org/) |
 | :------------------------------------------------------------| :---------------------------------------------------|
-|   Ubuntu* 18.04 long-term support (LTS), 64-bit              | 3.6, 3.7                                            |
-|   Ubuntu* 20.04 long-term support (LTS), 64-bit              | 3.6, 3.7                                            |
-|   Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.7                                            |
-|   CentOS* 7, 64-bit                                          | 3.6, 3.7                                            |
+|   Ubuntu* 18.04 long-term support (LTS), 64-bit              | 3.6, 3.7, 3.8                                            |
+|   Ubuntu* 20.04 long-term support (LTS), 64-bit              | 3.6, 3.7, 3.8                                           |
+|   Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.8                                            |
+|   CentOS* 7, 64-bit                                          | 3.6, 3.7, 3.8                                            |
 |   macOS* 10.15.x versions                                    | 3.6, 3.7, 3.8                                       |
 |   Windows 10*, 64-bit                                        | 3.6, 3.7, 3.8                                       |
 
@@ -46,7 +46,6 @@ To avoid dependency conflicts, use a virtual environment. Skip this
 
 Create virtual environment:
 ```sh
-python -m pip install --user virtualenv 
 python -m venv openvino_env
 ```
 
