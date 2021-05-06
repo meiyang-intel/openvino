@@ -12,30 +12,31 @@ OpenVINO™ toolkit is a comprehensive toolkit for quickly developing applicatio
 
 | Component                                                                                           | Description                                                                                                                                                                                                                                                                                                   |  
 |-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Model Optimizer](https://docs.openvinotoolkit.org/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) | This tool imports, converts, and optimizes models that were trained in popular frameworks to a format usable by Intel tools, especially the Inference Engine. <br>Popular frameworks include Caffe\*, TensorFlow\*, MXNet\*, and ONNX\*.                                                                              |
-| Additional Tools                                   | A set of tools to work with your models including [Accuracy Checker utility](https://docs.openvinotoolkit.org/latest/omz_tools_accuracy_checker.html), [Post-Training Optimization Tool](https://docs.openvinotoolkit.org/latest/pot_README.html)  |
+| [Model Optimizer](https://docs.openvinotoolkit.org/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html) | This tool imports, converts, and optimizes models that were trained in popular frameworks to a format usable by Intel tools, especially the Inference Engine. <br>Popular frameworks include Caffe\*, TensorFlow\*, MXNet\*, and ONNX\*.                                               |
+| Additional Tools                                   | A set of tools to work with your models including [Accuracy Checker utility](https://docs.openvinotoolkit.org/latest/omz_tools_accuracy_checker.html), [Post-Training Optimization Tool](https://docs.openvinotoolkit.org/latest/pot_README.html), [Benchmark Tool](../../inference-engine/samples/benchmark_app/README.md)                                    |
 
 **The Runtime Package Includes the Following Components Installed by Dependency:**
 
 | Component                                                                                           | Description                                                                                                                                                                                                                                                                                                   |  
 |-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Inference Engine](https://pypi.org/project/openvino)               | This is the engine that runs the deep learning model. It includes a set of libraries for an easy inference integration into your applications.                                                                                                                                                                |
+| [Inference Engine](https://pypi.org/project/openvino)               | This is the engine that runs the deep learning model. It includes a set of libraries for an easy inference integration into your applications.                                                                                                                                                                                                |
 
 
 ## System Requirements
+The complete list of supported hardware is available in the [Release Notes](https://software.intel.com/content/www/us/en/develop/articles/openvino-relnotes.html#inpage-nav-8).
 
 The table below lists the supported operating systems and Python* versions required to run the installation.
 
 | Supported Operating System                                   | [Python* Version (64-bit)](https://www.python.org/) |
 | :------------------------------------------------------------| :---------------------------------------------------|
-|   Ubuntu* 18.04 long-term support (LTS), 64-bit              | 3.6, 3.7                                            |
-|   Ubuntu* 20.04 long-term support (LTS), 64-bit              | 3.6, 3.7                                            |
-|   Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.7                                            |
-|   CentOS* 7, 64-bit                                          | 3.6, 3.7                                            |
+|   Ubuntu* 18.04 long-term support (LTS), 64-bit              | 3.6, 3.7, 3.8                                       |
+|   Ubuntu* 20.04 long-term support (LTS), 64-bit              | 3.6, 3.7, 3.8                                       |
+|   Red Hat* Enterprise Linux* 8, 64-bit                       | 3.6, 3.8                                            |
+|   CentOS* 7, 64-bit                                          | 3.6, 3.7, 3.8                                       |
 |   macOS* 10.15.x versions                                    | 3.6, 3.7, 3.8                                       |
 |   Windows 10*, 64-bit                                        | 3.6, 3.7, 3.8                                       |
 
-> **NOTE**: This package can be installed on other versions of Linux and Windows OSes, but only the specific versions above are fully validated.
+> **NOTE**: This package can be installed on other versions of macOS, Linux and Windows, but only the specific versions above are fully validated.
 
 ## Install the Developer Package
 
@@ -45,13 +46,17 @@ To avoid dependency conflicts, use a virtual environment. Skip this
    step only if you do want to install all dependencies globally.
 
 Create virtual environment:
+
+On Linux and macOS:
 ```sh
-python -m pip install --user virtualenv 
-python -m venv openvino_env
+# Depending on your OS, this step may require installing python3-venv
+python3 -m venv openvino_env
 ```
 
-> **NOTE**: On Linux and macOS, you may need to type `python3` instead of
-`python`. You may also need to [install pip](https://pip.pypa.io/en/stable/installing/).
+On Windows: 
+```sh
+python -m venv openvino_env
+```
 
 ### Step 2. Activate Virtual Environment
 
@@ -92,4 +97,3 @@ You will see the help message for Post-Training Optimization Tool if installatio
 
 - Intel® Distribution of OpenVINO™ toolkit home page: [https://software.intel.com/en-us/openvino-toolkit](https://software.intel.com/en-us/openvino-toolkit)
 - OpenVINO™ toolkit online documentation: [https://docs.openvinotoolkit.org](https://docs.openvinotoolkit.org)
-
