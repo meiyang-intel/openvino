@@ -9,30 +9,23 @@ A summary of the steps for optimizing and deploying a model that was trained wit
 
 ## Supported Topologies
 
+* **optical character recognition models:**
+	* ppocr-det
+	* ppocr-rec
+
 * **Classification models:**
 	* AlexNet
-	* VGG-16, VGG-19
-	* SqueezeNet v1.0, SqueezeNet v1.1
-	* ResNet-50, ResNet-101, Res-Net-152
-	* Inception v1, Inception v2, Inception v3, Inception v4
-	* CaffeNet
-	* MobileNet
-	* Squeeze-and-Excitation Networks: SE-BN-Inception, SE-Resnet-101, SE-ResNet-152, SE-ResNet-50, SE-ResNeXt-101, SE-ResNeXt-50
-	* ShuffleNet v2
+	* ResNet-50
+	* MobileNet v2, MobileNet v3
 
-* **Object detection models:**
-	* SSD300-VGG16, SSD500-VGG16
-	* Faster-RCNN
-	* RefineDet (MYRIAD plugin only)
+* **semantic segmentation models:**
+	* DeepLab V3 plus
+	* Faster-SCNN
+	* OCRNET: Object-Contextual Representations for Semantic Segmentation
 
-* **Face detection models:**
-	* VGG Face
-    * SSH: Single Stage Headless Face Detector
-
-* **Semantic segmentation models:**
-	* FCN8
-
-> **NOTE:** It is necessary to specify mean and scale values for most of the Caffe\* models to convert them with the Model Optimizer. The exact values should be determined separately for each model. For example, for Caffe\* models trained on ImageNet, the mean values usually are `123.68`, `116.779`, `103.939` for blue, green and red channels respectively. The scale value is usually `127.5`. Refer to [Framework-agnostic parameters](Converting_Model_General.md) for the information on how to specify mean and scale values.
+* **detection models:**
+	* Yolo v3
+    * ppyolo
 
 ## Convert a Paddle* Model <a name="Convert_From_Paddle"></a>
 
@@ -41,17 +34,17 @@ To convert a Paddle\* model:
 1. Go to the `$INTEL_OPENVINO_DIR/deployment_tools/model_optimizer` directory.
 2. Use the `mo.py` script to simply convert a model, specifying the path to the input model `.pdmodel` file and the path to an output directory with write permissions:
 ```sh
-python3 mo.py --input_model <INPUT_MODEL>.pdmodel --output_dir <OUTPUT_MODEL_DIR>
+python3 mo.py --input_model <INPUT_MODEL>.pdmodel --output_dir <OUTPUT_MODEL_DIR> --framework=paddle
 ```
 
 Two groups of parameters are available to convert your model:
 
 * [Framework-agnostic parameters](Converting_Model_General.md): These parameters are used to convert a model trained with any supported framework.
-> **NOTE:** `--scale`, `--scale_values`, `--mean_values`, `--mean_file` are unavailable in mo_paddle
+> **NOTE:** `--scale`, `--scale_values`, `--mean_values`, `--mean_file` are unavailable in mo_paddle.
 * [Paddle-specific parameters](#paddle_specific_conversion_params): Parameters used to convert only Paddle\* models.
 
 
-## Custom Layer Definition ??
+## Custom Layer Definition
 
 Internally, when you run the Model Optimizer, it loads the model, goes through the topology, and tries to find each layer type in a list of known layers. Custom layers are layers that are not included in the list of known layers. If your topology contains any layers that are not in this list of known layers, the Model Optimizer classifies them as custom.
 
