@@ -88,10 +88,6 @@ install_prerequisites_onnx.sh
 ```
 install_prerequisites_onnx.bat
 ```
-*   For Paddle on Windows:
-```
-install_prerequisites_paddle.bat
-```
 
 > **IMPORTANT**: **ONLY FOR CAFFE\*** By default, you do not need to install Caffe to create an
 > Intermediate Representation for a Caffe model, unless you use Caffe for
@@ -155,10 +151,6 @@ pip3 install -r requirements_kaldi.txt
     *   To install dependencies only for ONNX:
 ```shell
 pip3 install -r requirements_onnx.txt
-```
-    *   To install dependencies only for Paddle:
-```shell
-pip3 install -r requirements_paddle.txt
 ```
 
 ## Using the protobuf Library in the Model Optimizer for Caffe\*

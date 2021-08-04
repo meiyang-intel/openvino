@@ -15,7 +15,6 @@ The <code>mo.py</code> script is the universal entry point that can deduce the f
 * `.params` - MXNet\* models
 * `.onnx` - ONNX\* models
 * `.nnet` - Kaldi\* models.
-* `.pdmodel` - Paddle\* models.
 
 If the model files do not have standard extensions, you can use the ``--framework {tf,caffe,kaldi,onnx,mxnet,paddle}`` option to specify the framework type explicitly. 
 
