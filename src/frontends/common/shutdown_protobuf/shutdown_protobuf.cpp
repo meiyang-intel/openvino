@@ -1,4 +1,5 @@
 #include <google/protobuf/stubs/common.h>
+#include <iostream>
 
 #if defined(_WIN32)
 #    include <windows.h>
@@ -15,12 +16,15 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to DLL module
 
     case DLL_PROCESS_DETACH:
         google::protobuf::ShutdownProtobufLibrary();
+        std::cout << "SSSSSSSSSSSSSSSSSSSSSShudown" << std::endl;
         break;
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
 #elif defined(__linux__)
-extern "C" __attribute__((destructor)) void library_unload() {
+extern "C" __attribute__((destructor)) void library_unload();
+void library_unload() {
     google::protobuf::ShutdownProtobufLibrary();
+    std::cout << "SSSSSSSSSSSSSSSSSSSSSShudown" << std::endl;
 }
 #endif
