@@ -72,7 +72,7 @@ indicates whether the proposal bboxes are normalized or not.
 
 * **1**: `im_info` - tensor of type *T* and shape `[num_batches, 3]` or `[num_batches, 4]` providing input image info. The image info is layout as `[image_height, image_width, scale_height_and_width]` or as `[image_height, image_width, scale_height, scale_width]`. **Required.**
 
-* **2**: `anchors` - tensor of type *T* with shape `[height * width * number_of_anchors, 4]` providing anchors. The height * width * number describes the number of anchors. The anchor roi consists of 4 element tuples whose layout is `[xmin, ymin, xmax, ymax]`. **Required.**
+* **2**: `anchors` - tensor of type *T* with shape `[height * width * number_of_anchors, 4]` providing anchors. The height * width * number_of_anchors describes the number of anchors in all bbox. The anchor roi consists of 4 element tuples whose layout is `[xmin, ymin, xmax, ymax]`. **Required.**
 
 * **3**: `boxesdeltas` - tensor of type *T* with shape `[num_batches, number_of_anchors * 4, height, width]` providing deltas for anchors. The delta consists of 4 element tuples whose layout is `[dx, dy, log(dw), log(dh)]`. **Required.**
 
