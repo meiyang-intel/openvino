@@ -18,6 +18,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <cstdlib>
 
 using namespace InferenceEngine;
 
@@ -209,6 +210,19 @@ std::shared_ptr<ngraph::Function> dump_graph_as_ie_ngraph_net(const Graph &graph
 }
 
 #ifdef CPU_DEBUG_CAPS
+void serialize_subgraph(const Graph &graph, const std::string &graph_name) {
+    std::string graph_path = std::string(getenv("SUBGRAPH_DUMP_PATH")) + std::string("/") + graph_name + std::string(".xml");
+    if (graph_path.empty())
+        return;
+
+    if (graph_path == "cout")
+        serializeToCout(graph);
+    else if (!graph_path.compare(graph_path.size() - 4, 4, ".xml"))
+        serializeToXML(graph, graph_path);
+    else
+        IE_THROW() << "Unknown serialize format. Should be either 'cout' or '*.xml'. Got " << graph_path;
+}
+
 void serialize(const Graph &graph) {
     const std::string& path = graph.getConfig().debugCaps.execGraphPath;
 

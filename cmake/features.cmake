@@ -156,7 +156,7 @@ ie_dependent_option (ENABLE_SYSTEM_PUGIXML "use the system copy of pugixml" ${EN
 
 ie_dependent_option (ENABLE_SYSTEM_TBB  "use the system version of TBB" ${ENABLE_SYSTEM_TBB_DEFAULT} "THREADING MATCHES TBB" OFF)
 
-ie_option (ENABLE_DEBUG_CAPS "enable OpenVINO debug capabilities at runtime" OFF)
+ie_option (ENABLE_DEBUG_CAPS "enable OpenVINO debug capabilities at runtime" ON)
 
 ie_dependent_option (ENABLE_GPU_DEBUG_CAPS "enable GPU debug capabilities at runtime" ON "ENABLE_DEBUG_CAPS" OFF)
 

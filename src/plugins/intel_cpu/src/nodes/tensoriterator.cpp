@@ -15,6 +15,10 @@
 #include "common/cpu_memcpy.h"
 #include <utils/shape_inference/shape_inference_internal_dyn.hpp>
 
+#include "graph_dumper.h"
+//#include <ngraph/pass/manager.hpp>
+//#include <openvino/pass/serialize.hpp>
+
 using namespace dnnl;
 using namespace InferenceEngine;
 using namespace InferenceEngine::details;
@@ -365,6 +369,16 @@ void TensorIterator::getSupportedDescriptors() {
     }
     const std::shared_ptr<const ov::Model> body = tiOp->get_function();
     sub_graph.CreateGraph(body, context);
+#ifdef CPU_DEBUG_CAPS
+    ov::intel_cpu::serialize_subgraph(sub_graph, getName());
+    //std::string graph_path = std::string("/tmp/subgraph/") + graph_name + std::string(".xml");
+    //std::string binPath;
+    //ngraph::pass::Manager manager;
+    //manager.register_pass<ov::pass::Serialize>(graph_path,
+    //                                           binPath,
+    //                                           ov::pass::Serialize::Version::IR_V10);
+    //manager.run_passes(sub_graph.dump());
+#endif
 
     const auto &inMap = sub_graph.GetInputNodesMap();
     for (const auto &param : tiOp->get_function()->get_parameters()) {
