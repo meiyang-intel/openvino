@@ -888,7 +888,7 @@ bool FullyConnected::canBeExecutedInConv1x1() const {
             retVal = false;
     }
 
-    return retVal;
+    return false;
 }
 
 FullyConnected::ExecutorInnerProduct::ExecutorInnerProduct(const dnnl::inner_product_forward::primitive_desc& pd) {
