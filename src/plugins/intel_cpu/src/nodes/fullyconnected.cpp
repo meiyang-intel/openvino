@@ -851,7 +851,7 @@ bool FullyConnected::canBeExecutedInConv1x1() const {
             retVal = false;
     }
 
-    return retVal;
+    return false;
 }
 
 bool FullyConnected::useSparseWeightsDecompression() {
