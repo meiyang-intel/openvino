@@ -12,28 +12,26 @@ namespace frontend {
 namespace paddle {
 namespace op {
 
-std::shared_ptr<Node> handle_minus_index(const OutputVector& node, const Output<Node>& dim) {
+Output<Node> handle_minus_index(const OutputVector& node, const Output<Node>& dim) {
+    const auto zero = default_opset::Constant::create(element::i64, {1}, {0});
     const auto new_node = std::make_shared<default_opset::Concat>(node, 0);
-    return new_node;
+    const auto mask = std::make_shared<default_opset::Less>(new_node, zero);
+    const auto res = std::make_shared<default_opset::Add>(new_node, dim);
+    return std::make_shared<default_opset::Select>(mask, res, new_node);
 }
 
-std::shared_ptr<Node> handle_minus_index(const std::vector<int64_t>& node, const Output<Node>& dim) {
+Output<Node> handle_minus_index(const std::vector<int64_t>& node, const Output<Node>& dim) {
+    const auto zero = default_opset::Constant::create(element::i64, {1}, {0});
     const auto new_node = default_opset::Constant::create(element::i64, {node.size()}, node);
-    return new_node;
+    const auto mask = std::make_shared<default_opset::Less>(new_node, zero);
+    const auto res = std::make_shared<default_opset::Add>(new_node, dim);
+    return std::make_shared<default_opset::Select>(mask, res, new_node);
 }
 
-// std::shared_ptr<Node> handle_maximum_index(Output<Node>& node, const Output<Node>& update_node) {
-//     const auto maximum_node = default_opset::Constant::create(element::i64, {1}, {INT_MAX});
-//     const auto mask = std::make_shared<default_opset::Equal>(node, maximum_node);
-//     return std::make_shared<default_opset::Select>(mask, update_node, node);
-// }
-
-bool is_contain_minus(const std::vector<int64_t> vec) {
-    for (int64_t i : vec) {
-        if (i < 0)
-            return true;
-    }
-    return false;
+Output<Node> handle_maximum_index(Output<Node>& node, const Output<Node>& update_node) {
+    const auto maximum_node = default_opset::Constant::create(element::i64, {1}, {INT_MAX});
+    const auto mask = std::make_shared<default_opset::Equal>(node, maximum_node);
+    return std::make_shared<default_opset::Select>(mask, update_node, node);
 }
 
 NamedOutputs set_value(const NodeContext& node) {
@@ -99,14 +97,9 @@ NamedOutputs set_value(const NodeContext& node) {
         ends = handle_minus_index(node.get_ng_inputs("EndsTensorList"), spec_dim_node);
         steps = std::make_shared<default_opset::Concat>(node.get_ng_inputs("StepsTensorList"), 0);
     } else if (node.has_attribute("starts") && node.has_attribute("steps") && node.has_attribute("ends")) {
-        const auto start_vec = node.get_attribute<std::vector<int64_t>>("starts");
-        const auto ends_vec = node.get_attribute<std::vector<int64_t>>("ends");
+        starts = handle_minus_index(node.get_attribute<std::vector<int64_t>>("starts"), spec_dim_node);
+        ends = handle_minus_index(node.get_attribute<std::vector<int64_t>>("ends"), spec_dim_node);
         const auto step_vec = node.get_attribute<std::vector<int64_t>>("steps");
-        if (is_contain_minus(start_vec) || is_contain_minus(ends_vec) || is_contain_minus(step_vec)) {
-            PADDLE_OP_CHECK(node, (false), "Currently not support minus start, ends and steps!");
-        }
-        starts = handle_minus_index(start_vec, spec_dim_node);
-        ends = handle_minus_index(ends_vec, spec_dim_node);
         steps = default_opset::Constant::create(element::i64, {step_vec.size()}, step_vec);
     } else
         PADDLE_OP_CHECK(node, (false), "Invalid arguments!");
@@ -152,7 +145,7 @@ NamedOutputs set_value(const NodeContext& node) {
     Output<Node> range_node = std::make_shared<default_opset::Range>(zero_node, numel_node, one_node, element::i64);
     // reshape to input_shape
     range_node = std::make_shared<default_opset::Reshape>(range_node, input_shape, true);
-    // slice range node, get the indices that to be updated
+    // slice range node, get the indices thta to be updated
     Output<Node> sliced_range_node = std::make_shared<default_opset::StridedSlice>(range_node,
                                                                                    starts_node,
                                                                                    ends_node,
