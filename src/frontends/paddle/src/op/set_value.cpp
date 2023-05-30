@@ -105,7 +105,7 @@ NamedOutputs set_value(const NodeContext& node) {
         PADDLE_OP_CHECK(node, (false), "Invalid arguments!");
 
     // for unsepcified end: x[::2], end will be 2147483647
-    // ends = handle_maximum_index(ends, spec_dim_node);
+    ends = handle_maximum_index(ends, spec_dim_node);
 
     // 3.1 get starts node
     starts_node =
