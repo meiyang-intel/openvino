@@ -69,6 +69,7 @@ bool evaluate_matmul(const op::MatMul* op,
     bool rc = true;
 
     switch (arg0->get_element_type()) {
+        NGRAPH_TYPE_CASE(evaluate_matmul, i8, op, arg0, arg1, output);
         NGRAPH_TYPE_CASE(evaluate_matmul, i32, op, arg0, arg1, output);
         NGRAPH_TYPE_CASE(evaluate_matmul, i64, op, arg0, arg1, output);
         NGRAPH_TYPE_CASE(evaluate_matmul, u32, op, arg0, arg1, output);

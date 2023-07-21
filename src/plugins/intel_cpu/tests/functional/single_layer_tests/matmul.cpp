@@ -364,6 +364,17 @@ const auto testParams2D_smoke = ::testing::Combine(::testing::Combine(::testing:
                                              ::testing::ValuesIn(fusingParamsSet2D_smoke),
                                              ::testing::ValuesIn(filterSpecificParams()));
 
+const auto testParams2D_I8_smoke = ::testing::Combine(::testing::Combine(::testing::ValuesIn(IS2D_smoke),
+                                                                ::testing::Values(ElementType::i8),
+                                                                ::testing::Values(ElementType::undefined),
+                                                                ::testing::Values(ElementType::undefined),
+                                                                ::testing::Values(helpers::InputLayerType::CONSTANT),
+                                                                ::testing::Values(CommonTestUtils::DEVICE_CPU),
+                                                                ::testing::Values(emptyAdditionalConfig)),
+                                             ::testing::Values(MatMulNodeType::FullyConnected),
+                                             ::testing::Values(emptyFusingSpec),
+                                             ::testing::ValuesIn(filterSpecificParams()));
+
 const auto testParams2DBF16_smoke = ::testing::Combine(::testing::Combine(::testing::ValuesIn(IS2D_smoke),
                                                                     ::testing::ValuesIn(netPRCs),
                                                                     ::testing::Values(ElementType::undefined),
@@ -376,6 +387,7 @@ const auto testParams2DBF16_smoke = ::testing::Combine(::testing::Combine(::test
                                                  ::testing::ValuesIn(filterSpecificParams()));
 
 INSTANTIATE_TEST_SUITE_P(smoke_FC_2D, MatMulLayerCPUTest, testParams2D_smoke, MatMulLayerCPUTest::getTestCaseName);
+INSTANTIATE_TEST_SUITE_P(smoke_FC_2D_I8, MatMulLayerCPUTest, testParams2D_I8_smoke, MatMulLayerCPUTest::getTestCaseName);
 INSTANTIATE_TEST_SUITE_P(smoke_FC_2D_BF16, MatMulLayerCPUTest, testParams2DBF16_smoke, MatMulLayerCPUTest::getTestCaseName);
 
 const auto testParams2D_nightly = ::testing::Combine(::testing::Combine(::testing::ValuesIn(IS2D_nightly),
@@ -595,6 +607,21 @@ const std::vector<ShapeRelatedParams> IS2D_Brgemm_nightly = {
     },
 };
 
+const auto fullyConnectedParams2D_Brgemm_I8_smoke = ::testing::Combine(::testing::ValuesIn(IS2D_Brgemm_smoke),
+                                                       ::testing::Values(ElementType::i8),
+                                                       ::testing::Values(ElementType::undefined),
+                                                       ::testing::Values(ElementType::undefined),
+                                                       ::testing::Values(helpers::InputLayerType::CONSTANT),
+                                                       ::testing::Values(CommonTestUtils::DEVICE_CPU),
+                                                       ::testing::ValuesIn(filterAdditionalConfig_Brgemm()));
+
+const auto testParams2D_Brgemm_I8_smoke = ::testing::Combine(fullyConnectedParams2D_Brgemm_I8_smoke,
+                                             ::testing::Values(MatMulNodeType::FullyConnected),
+                                             ::testing::Values(emptyFusingSpec),
+                                             ::testing::ValuesIn(filterSpecificParams_Brgemm()));
+
+INSTANTIATE_TEST_SUITE_P(smoke_FC_2D_Brgemm_I8, MatMulLayerCPUTest, testParams2D_Brgemm_I8_smoke, MatMulLayerCPUTest::getTestCaseName);
+
 const auto fullyConnectedParams2D_Brgemm_smoke = ::testing::Combine(::testing::ValuesIn(IS2D_Brgemm_smoke),
                                                        ::testing::Values(ElementType::f32),
                                                        ::testing::Values(ElementType::undefined),
@@ -746,7 +773,6 @@ const auto testParams2D_Brgemm_Amx_smoke = ::testing::Combine(fullyConnectedPara
                                              ::testing::ValuesIn(filterSpecificParams_BrgemmAmx()));
 
 INSTANTIATE_TEST_SUITE_P(smoke_FC_2D_Brgemm_Amx, MatMulLayerCPUTest, testParams2D_Brgemm_Amx_smoke, MatMulLayerCPUTest::getTestCaseName);
-
 
 const auto fullyConnectedParams2D_Brgemm_nightly = ::testing::Combine(::testing::ValuesIn(IS2D_Brgemm_nightly),
                                                        ::testing::Values(ElementType::f32),
