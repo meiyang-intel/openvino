@@ -9,6 +9,9 @@
 #include "common_test_utils/file_utils.hpp"
 #include "openvino/util/file_util.hpp"
 
+#include "openvino/pass/manager.hpp"
+#include "openvino/pass/serialize.hpp"
+
 namespace {
 template <typename T>
 typename std::enable_if<std::is_floating_point<T>::value, testing::AssertionResult>::type
@@ -195,6 +198,11 @@ TestCase::TestCase(const std::shared_ptr<ov::Model>& function, const std::string
             "TEMPLATE");
     } catch (...) {
     }
+
+    ov::pass::Manager pass_manager;
+    pass_manager.register_pass<ov::pass::Serialize>(std::string("/home/iot/tmp/slice/a.xml"), std::string("/home/iot/tmp/slice/a.bin"));
+    pass_manager.run_passes(function);
+
     m_request = m_core.compile_model(function, dev).create_infer_request();
 }
 
