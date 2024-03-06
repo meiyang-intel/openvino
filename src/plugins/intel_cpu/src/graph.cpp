@@ -40,6 +40,7 @@
 #include "utils/node_dumper.h"
 #include "utils/verbose.h"
 #include "utils/precision_support.h"
+#include "utils/profiler.hpp"
 
 #include <oneapi/dnnl/dnnl.hpp>
 #include "common/primitive_desc_iface.hpp"
@@ -423,7 +424,6 @@ void Graph::InitNodes() {
 
 void Graph::InitDescriptors() {
     OV_ITT_SCOPE_CHAIN(FIRST_INFERENCE, taskChain, itt::domains::intel_cpu_LT, "InitDescriptors", "Prepare");
-
     for (auto &node : graphNodes) {
         OV_ITT_SCOPE_NEXT(FIRST_INFERENCE, taskChain, node->profiling.getSupportedDescriptors);
         DEBUG_LOG("Get supported primitive descriptors for node: ", node->getName());
@@ -969,6 +969,7 @@ bool Graph::ProcessDynNodes() {
 void Graph::PushInputData(const std::size_t& index, const ov::SoPtr<ITensor>& input) {
     if (!IsReady()) OPENVINO_THROW("Wrong state. Topology not ready.");
     auto input_itr = inputNodesMap.find(index);
+    auto _prof = Profile("Graph::PushInputData");
     if (input_itr != inputNodesMap.end()) {
         auto node = input_itr->second;
         auto childEdge = node->getChildEdgeAt(0);
@@ -999,6 +1000,7 @@ void Graph::PushInputData(const std::size_t& index, const ov::SoPtr<ITensor>& in
 
 // suppose always being shared infer_request intel_cpu::Tensor to Graph if isDynamic.
 void Graph::PullOutputData(std::unordered_map<std::size_t, ov::SoPtr<ITensor>>& output) {
+    auto _prof = Profile("Graph::PullOutputData");
     if (!IsReady())
         OPENVINO_THROW("Wrong state. Topology not ready.");
 
@@ -1091,7 +1093,13 @@ VecMemoryDescs Graph::getOutputMemoryDescriptors() const {
 }
 
 void Graph::InferStatic(SyncInferRequest* request, int numaId) {
+    auto _prof0 = Profile("Graph" + std::to_string(graph_id) + "::InferStatic_#" + std::to_string(infer_count));
     for (const auto& node : m_executableGraphNodes) {
+        auto _prof = Profile(node->getTypeStr());
+        if (_prof) {
+            _prof->args["Name"] = node->getName();
+            _prof->args["Impl"] = node->getPrimitiveDescriptorType();
+        }
         ExecuteNodeWithCatch(node, request, numaId);
     }
 }
@@ -1326,12 +1334,18 @@ inline void Graph::ExecuteNodeWithCatch(const NodePtr& node, SyncInferRequest* r
 template<typename UpdateStrategy>
 void Graph::InferDynamic(SyncInferRequest* request, int numaId, UpdateStrategy&& update) {
     size_t inferCounter = 0;
+    auto _prof0 = Profile("Graph" + std::to_string(graph_id) + "::InferDynamic_#" + std::to_string(infer_count));
     for (auto stopIndx : m_executableSyncNodesInds) {
         update(stopIndx);
 
         for (; inferCounter < stopIndx; ++inferCounter) {
             auto& node = m_executableGraphNodes[inferCounter];
 
+            auto _prof = Profile(node->getTypeStr());
+            if (_prof) {
+                _prof->args["Name"] = node->getName();
+                _prof->args["Impl"] = node->getPrimitiveDescriptorType();
+            }
             ExecuteNodeWithCatch(node, request, numaId);
         }
     }
@@ -1374,7 +1388,7 @@ void Graph::Infer(SyncInferRequest* request) {
         OPENVINO_ASSERT(IsReady(), "Wrong state of the ov::intel_cpu::Graph. Topology is not ready: ", static_cast<int>(status));
     }
 
-    if (infer_count != -1) infer_count++;
+    infer_count++;
 }
 
 void Graph::SortTopologically() {

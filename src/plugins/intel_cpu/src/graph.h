@@ -27,6 +27,7 @@ namespace ov {
 namespace intel_cpu {
 
 class SyncInferRequest;
+class ProfilerGraph;
 namespace node {
 class MemoryStateNode;
 } // namespace node
@@ -52,7 +53,9 @@ public:
     bool IsReady() {
         return one_of(status, Status::ReadyStatic, Status::ReadyDynamic, Status::ReadyDynamicSeq);
     }
-
+    void SetGraphID(int id) {
+        graph_id = id;
+    }
     const Config & getConfig() const {
         return m_context->getConfig();
     }
@@ -224,7 +227,8 @@ protected:
 
     // For dumping purposes. -1 - no counting, all other positive
     // values mean increment it within each Infer() call
-    int infer_count = -1;
+    int infer_count = 0;
+    int graph_id = -1;
 
     std::vector<NodePtr> graphNodes;
     std::vector<EdgePtr> graphEdges;
@@ -302,6 +306,8 @@ private:
     dnnl::stream m_stream;
 
     MemoryControl* m_pMemoryControl = nullptr;
+    bool isSubgraph = false;
+    friend class ProfilerGraph;
 };
 
 using GraphPtr = std::shared_ptr<Graph>;
