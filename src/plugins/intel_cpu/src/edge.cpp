@@ -546,49 +546,70 @@ bool Edge::inPlace(LOOK look) const {
 }
 
 NodePtr Edge::modifiedInPlace() const {
-    auto childNode = getChild();
-    if (!childNode || !childNode->isInPlace() || childNode->getChildEdges().empty()) {
-        return nullptr;
-    }
-    // check if the children nodes are able to modify the memory
-    auto childPort = getOutputNum();
-    auto inPlaceInputPort = childNode->inPlaceInputPort(childPort);
-    if (inPlaceInputPort >= 0) {
-        if (childNode->isExecutable()) {
-            // Node can modify the memory
-            return childNode;
+    std::vector<NodePtr> modified_nodes;
+
+    std::function<void(EdgePtr& e)> collect_modified_nodes;
+    collect_modified_nodes = [&modified_nodes, &collect_modified_nodes](const EdgePtr& e) {
+        auto childNode = e->getChild();
+	// MemoryInput will update the memory of its sibling MemoryOutput.
+	// So MemoryInput is modifying node of its sibling MemoryOutput.
+        if (Type::MemoryOutput == childNode->getType()) {
+	    modified_nodes.push_back(make_shared<Node>(childNode->getInputNode()));
+	    return;
+	}
+        if (!childNode || !childNode->isInPlace() || childNode->getChildEdges().empty()) {
+            return;
         }
-        for (auto&& edge : childNode->getChildEdgesAtPort(inPlaceInputPort)) {
-            // continue searching
-            if (auto result = edge->modifiedInPlace()) {
-                return result;
-            }
-        }
-    }
-    // check backward dependency
-    if (auto childSPD = childNode->getSelectedPrimitiveDescriptor()) {
-        auto& outConfs = childSPD->getConfig().outConfs;
-        for (size_t i = 0; i < outConfs.size(); ++i) {
-            const auto& conf = outConfs[i];
-            if (childPort < 0 || conf.inPlace() != childPort ||
-                Type::MemoryInput == childNode->getType()) { //exception type, it doesn't modify memory
-                continue;
-            }
+        // check if the children nodes are able to modify the memory
+        auto childPort = e->getOutputNum();
+        auto inPlaceInputPort = childNode->inPlaceInputPort(childPort);
+        if (inPlaceInputPort >= 0) {
             if (childNode->isExecutable()) {
                 // Node can modify the memory
-                return childNode;
+                modified_nodes.push_back(childNode);
             }
-            for (auto&& edge : childNode->getChildEdgesAtPort(i)) {
+            for (auto&& edge : childNode->getChildEdgesAtPort(inPlaceInputPort)) {
                 // continue searching
-                if (auto result = edge->modifiedInPlace()) {
-                    return result;
+		collect_modified_nodes(edge);
+            }
+        }
+        // check backward dependency
+        if (auto childSPD = childNode->getSelectedPrimitiveDescriptor()) {
+            auto& outConfs = childSPD->getConfig().outConfs;
+            for (size_t i = 0; i < outConfs.size(); ++i) {
+                const auto& conf = outConfs[i];
+                if (childPort < 0 || conf.inPlace() != childPort ||
+                    Type::MemoryInput == childNode->getType()) { //exception type, it doesn't modify memory
+                    continue;
+                }
+                if (childNode->isExecutable()) {
+                    // Node can modify the memory
+                    modified_nodes.push_back(childNode);
+                }
+                for (auto&& edge : childNode->getChildEdgesAtPort(i)) {
+                    // continue searching
+		    collect_modified_nodes(edge);
                 }
             }
         }
     }
 
-    // nothing has been found
-    return nullptr;
+    collect_modified_nodes(this);
+
+    if (modified_nodes.empty())
+        return nullptr;
+
+    NodePtr result = modified_nodes.back();
+    int exec_index = result->getExecIndex();
+    modified_nodes.pop_back();
+    for (auto node : modified_nodes) {
+        auto node_exec_index = node->getExecIndex();
+	if (node_exec_index < exec_index && nodex_exec_index > 0) {
+            result = node;
+	    exec_index = node_exec_index
+	}
+    }
+    return result;
 }
 
 }   // namespace intel_cpu
