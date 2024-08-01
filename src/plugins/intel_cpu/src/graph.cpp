@@ -1443,6 +1443,12 @@ void Graph::ParalleMtNuma(size_t num_nodes,
     while (nodes_remain.load() > 0) {}
 }
 
+void Graph::UpdateNodesState() {
+    for (const auto& node : m_executableGraphNodes) {
+	node->update_state();
+    }
+}
+
 void Graph::Infer(SyncInferRequest* request) {
     DEBUG_LOG("Infer graph: ", GetName(), ". Status: ", static_cast<int>(status));
 
@@ -1459,6 +1465,7 @@ void Graph::Infer(SyncInferRequest* request) {
     default:
         OPENVINO_ASSERT(IsReady(), "Wrong state of the ov::intel_cpu::Graph. Topology is not ready: ", static_cast<int>(status));
     }
+    update_nodes_state();
 
     if (infer_count != -1) infer_count++;
 }

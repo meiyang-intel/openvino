@@ -229,6 +229,7 @@ protected:
     void ExecuteNode(const NodePtr& node, const dnnl::stream& stream) const;
     void CreatePrimitivesAndExecConstants() const;
     void InferStatic(SyncInferRequest* request);
+    void UpdateNodesState();
 
     template<typename UpdateStrategy>
     void InferDynamic(SyncInferRequest* request, UpdateStrategy&& update);
